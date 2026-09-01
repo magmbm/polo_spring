@@ -5,7 +5,7 @@ on:
     branches:
       - main
 jobs:
-  build_app_jar:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
       - name: revision_de_codigo
@@ -25,7 +25,7 @@ jobs:
           mkdir -p ~/.ssh
           echo ${{ secrets.SSH_KEY }} ~/.ssh/polo
           chmod 600 ~/.ssh/polo
-          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H "${{ secrets.EC2_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
       - name: copy_app_jar
         run: | 
           ssh -i ~/.ssh/polo ec2-user@${{ secrets.EC2_IP }} 'mkdir -p /home/ec2-user/app'
