@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
@@ -21,28 +22,30 @@ jobs:
         run: ./gradlew bootJar -x test
 
       - name: ssh_key
-        run: | 
+        run: |
           mkdir -p ~/.ssh
-          echo ${{ secrets.SSH_KEY }} ~/.ssh/polo
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/polo
           chmod 600 ~/.ssh/polo
           ssh-keyscan -H "${{ secrets.EC2_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
+
       - name: copy_app_jar
-        run: | 
+        run: |
           ssh -i ~/.ssh/polo ec2-user@${{ secrets.EC2_IP }} 'mkdir -p /home/ec2-user/app'
           scp -i ~/.ssh/polo build/libs/*.jar ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/app/
-           - name: Restart Spring Boot App via SSH
-      run: |
-        ssh -i ~/.ssh/polo ec2-user@${{ secrets.EC2_IP }} '
-          set -e
-          mkdir -p /home/ec2-user/app
-          command -v java >/dev/null 2>&1 || sudo dnf install -y java-21-amazon-corretto
-          
-          fuser -k 8080/tcp || true
-          pkill -x java || true
-          sleep 2
 
-          setsid java -jar /home/ec2-user/app/*.jar > /home/ec2-user/app/app.log 2>&1 < /dev/null &
-          disown || true
+      - name: Restart Spring Boot App via SSH
+        run: |
+          ssh -i ~/.ssh/polo ec2-user@${{ secrets.EC2_IP }} '
+            set -e
+            mkdir -p /home/ec2-user/app
+            command -v java >/dev/null 2>&1 || sudo dnf install -y java-21-amazon-corretto
+            
+            fuser -k 8080/tcp || true
+            pkill -x java || true
+            sleep 2
 
-          sleep 3
-          exit 0
+            setsid java -jar /home/ec2-user/app/*.jar > /home/ec2-user/app/app.log 2>&1 < /dev/null &
+            disown || true
+
+            sleep 3
+            exit 0'
