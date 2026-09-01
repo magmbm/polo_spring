@@ -8,6 +8,7 @@ on:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
+    environment: polo_env
     steps:
       - name: revision_de_codigo
         uses: actions/checkout@v4
