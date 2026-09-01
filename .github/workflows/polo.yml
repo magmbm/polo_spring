@@ -19,7 +19,9 @@ jobs:
           java-version: '21'
 
       - name: build_polo_app
-        run: ./gradlew bootJar -x test
+        run: |
+          chmod 700 ./gradlew
+          ./gradlew bootJar -x test
 
       - name: ssh_key
         run: |
