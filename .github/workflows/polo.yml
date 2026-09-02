@@ -46,7 +46,11 @@ jobs:
             fuser -k 8080/tcp || true
             pkill -x java || true
             sleep 2
-
+      
+            export AZURE_CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}"
+            export AZURE_TENANT_ID="${{ secrets.AZURE_TENANT_ID }}"
+            export AZURE_APP_ID_URI="${{ secrets.AZURE_APP_ID_URI }}"
+            
             setsid java -jar /home/ec2-user/app/*.jar > /home/ec2-user/app/app.log 2>&1 < /dev/null &
             disown || true
 
