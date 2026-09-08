@@ -42,7 +42,7 @@ jobs:
           tags: ${{ secrets.GITHUB_REGISTRY }}/mascotas-back-img:latest
 
       - name: deploy_ec2
-        uses: appleboy/ssh-action@v
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_IP }}
           username: ec2-user
