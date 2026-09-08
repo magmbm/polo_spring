@@ -8,6 +8,9 @@ on:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      packages: write
     environment: polo_env
     steps:
       - name: revision_de_codigo
@@ -24,31 +27,52 @@ jobs:
           chmod 700 ./gradlew
           ./gradlew bootJar -x test
 
-      - name: ssh_key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/polo
-          chmod 600 ~/.ssh/polo
-          ssh-keyscan -H "${{ secrets.EC2_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
+      - name: login_github_registry
+        uses: docker/login-action@v3 
+        with:
+          registry: ${{ secrets.GITHUB_REGISTRY }}
+          username: ${{ secrets.GITHUB_USER }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: copy_app_jar
-        run: |
-          ssh -i ~/.ssh/polo ec2-user@${{ secrets.EC2_IP }} 'mkdir -p /home/ec2-user/app'
-          scp -i ~/.ssh/polo build/libs/*.jar ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/app/
+      - name: build_push_image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.GITHUB_REGISTRY }}/mascotas-back-img:latest
 
-      - name: Restart Spring Boot App via SSH
-        run: |
-          ssh -i ~/.ssh/polo ec2-user@${{ secrets.EC2_IP }} '
-            set -e
-            mkdir -p /home/ec2-user/app
-            command -v java >/dev/null 2>&1 || sudo dnf install -y java-21-amazon-corretto
-            
-            fuser -k 8080/tcp || true
-            pkill -x java || true
-            sleep 2
+      - name: deploy_ec2
+        uses: appleboy/ssh-action@v
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            if [ ! -f /swapfile ]; then
+              sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+              sudo chomd 400 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+            fi
 
-            setsid java -jar /home/ec2-user/app/*.jar > /home/ec2-user/app/app.log 2>&1 < /dev/null &
-            disown || true
+            if ! command -v docker &> /dev/null; then 
+              sudo dnf update -y
+              sudo dnf install -y docker
+              sudo systemctl enable docker --now
+              sudo usermod -aG docker ec2-user
+            fi
 
-            sleep 3
-            exit 0'
+            sg docker -c "
+              docker pull ${{ secrets.GITHUB_REGISTRY }}/mascotas-back-img:latest
+
+              docker stop backend-cont || true
+              docker rm backend-cont || true
+              docker image prune -f
+
+              docker run -d \
+                --name backend-cont \
+                -p 8080:8080 \
+                -e PUBLIC_HOST_URL='http://$EC2_IP' \
+                --restart unless-stopped \
+                ${{ secrets.GITHUB_REGISTRY }}/mascotas-back-img:latest
+            "
