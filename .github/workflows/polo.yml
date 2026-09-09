@@ -12,11 +12,11 @@ env:
 
 jobs:
   build_and_push:
+    environment: polo_env
     runs-on: ubuntu-latest
     permissions: 
       contents: read
       packages: write
-    environment: polo_env
     steps:
       - name: revision_de_codigo
         uses: actions/checkout@v4
