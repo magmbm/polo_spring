@@ -54,6 +54,9 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
           script: |
+            echo "-------"
+            echo ${{ secrets.EC2_IP }}
+            echo "-------"
             if [ ! -f /swapfile ]; then
               sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
               sudo chmod 400 /swapfile
