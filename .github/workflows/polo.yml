@@ -87,6 +87,6 @@ jobs:
                 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             "
         env:
-          TARGET_HOST_IP: ${{ secret.EC2_IP }}
+          TARGET_HOST_IP: ${{ secrets.EC2_IP }}
           #API_GATEWAY_SECRET: ${{ secrets.API_GATEWAY_SECRET }}
           #GH_CR_PAT: ${{ secrets.GH_CR_PAT }}
