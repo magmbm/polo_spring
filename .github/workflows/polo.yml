@@ -53,9 +53,10 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
+          envs: EC2_IP
           script: |
             echo "-------"
-            echo ${{ secrets.EC2_IP }}
+            echo "Longitud del secreto: ${#EC2_IP}"
             echo "-------"
             if [ ! -f /swapfile ]; then
               sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
