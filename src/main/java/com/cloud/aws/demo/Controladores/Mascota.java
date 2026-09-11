@@ -1,16 +1,17 @@
 package com.cloud.aws.demo.Controladores;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/mascotas")
 public class Mascota {
     
     @GetMapping("/polo")
-	@PreAuthorize("hasRole('OT.Read')")
+	//@PreAuthorize("hasRole('OT.Read')")
 	public String polo_endpoint() {
 		return "AWS_Polo";
 	}
@@ -27,7 +28,7 @@ public class Mascota {
 	}
 
 	@GetMapping("/mascota/{id}/vacunado")
-	public Boolean vacunado() {
+	public Boolean vacunado(@PathVariable int id_mascota) {
 		return true;
 	}
 }
