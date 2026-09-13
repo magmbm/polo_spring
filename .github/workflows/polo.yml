@@ -99,7 +99,7 @@ jobs:
             # --- MAPEO CRUZADO: Puerto 80 del Servidor al 8080 del Contenedor ---
             docker run -d \
               --name ${{ env.CONTAINER_NAME }} \
-              -p 80:8080 \
+              -p 8080:8080 \
               -e PORT=8080 \
               -e PUBLIC_HOST_URL='http://$TARGET_HOST_IP' \
               --restart unless-stopped \

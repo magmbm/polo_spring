@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/mascotas")
 public class Mascota {
+
+	@GetMapping("/")
+	public String home() {
+		return "Home de Mascotas";
+	}
     
     @GetMapping("/polo")
 	//@PreAuthorize("hasRole('OT.Read')")
