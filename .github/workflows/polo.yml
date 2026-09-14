@@ -102,7 +102,7 @@ jobs:
               -p 8080:8080 \
               -e PORT=8080 \
               -e PUBLIC_HOST_URL='http://$TARGET_HOST_IP' \
-              -e API_KEY='${{ secrets.API_KEY }}'
+              -e API_KEY='${{ secrets.API_KEY }}' \
               --restart unless-stopped \
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           "
