@@ -28,6 +28,7 @@ public class SecretGatewayFilter extends OncePerRequestFilter {
 
         // Validar que la cabecera exista y coincida exactamente con el secreto
         if (expectedSecret == null || !expectedSecret.equals(secretHeader)) {
+            System.out.println("Secreo invalido o no encontrado");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("Acceso denegado: Secreto de pasarela inválido o ausente");
             return;
