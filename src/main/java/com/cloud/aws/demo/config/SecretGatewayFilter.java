@@ -27,13 +27,11 @@ public class SecretGatewayFilter extends OncePerRequestFilter {
         System.out.println("DEBUG SECRETO -> Ruta: " + path + " | Recibido: [" + secretHeader + "] | Esperado: [" + expectedSecret + "]");
 
         // Validar que la cabecera exista y coincida exactamente con el secreto
-        /*
         if (expectedSecret == null || !expectedSecret.equals(secretHeader)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("Acceso denegado: Secreto de pasarela inválido o ausente");
             return;
         }
-        */
 
         filterChain.doFilter(request, response);
     }
