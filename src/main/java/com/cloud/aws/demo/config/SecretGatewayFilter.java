@@ -32,7 +32,7 @@ public class SecretGatewayFilter extends OncePerRequestFilter {
             response.getWriter().write("Acceso denegado: Secreto de pasarela inválido o ausente");
             return;
         }
-
+        System.out.println("Se envia correctamente el secreto");
         filterChain.doFilter(request, response);
     }
 }
